@@ -2,10 +2,13 @@ package main
 
 import (
 	"github.com/hitchnsmile/go-hangman/events"
+	"github.com/hitchnsmile/go-hangman/screens"
 	termbox "github.com/nsf/termbox-go"
 )
 
 func main() {
+	var h screens.Switch
+
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
@@ -19,5 +22,7 @@ func main() {
 		}
 	}()
 
-	events.EventHandler(event)
+	h.X, h.Y = termbox.Size()
+	h.ShowMenu()
+	events.EventHandler(event, &h)
 }
