@@ -54,6 +54,7 @@ func (s *Switch) MenuEnter(selectedLine MenuState) {
 		// Render previous game
 	case MenuLeaderboard:
 		s.CurrentState = GameLeaderboard
+		s.Leaderboard()
 		// Render Leaderboard
 	}
 }

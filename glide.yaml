@@ -1,3 +1,2 @@
 package: github.com/hitchnsmile/go-hangman
-import:
-- package: github.com/zhexuany/wordGenerator
+import: []

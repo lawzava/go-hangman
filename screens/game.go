@@ -38,6 +38,7 @@ func (s *Switch) NewGame() {
 	s.GoalWord = getWord()
 	s.Guesses = s.Guesses[:0]
 	s.CurrentState = GameStarted
+	s.GameID = s.DB.InsertGame(s.GoalWord, s.Guesses)
 	s.ShowGame()
 }
 
@@ -59,6 +60,7 @@ func (s *Switch) AddGuess(c rune) {
 		}
 	}
 	s.Guesses = append(s.Guesses, c)
+	s.DB.UpdateGame(s.GoalWord, s.Guesses, s.GameID)
 	s.ShowGame()
 }
 
