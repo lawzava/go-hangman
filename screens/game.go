@@ -106,7 +106,6 @@ func renderGame(word string, guesses []rune) GameState {
 			printSimpleText(gameWonText, 2, 5)
 			printHangman(mistakes)
 			return GameFinished
-			// Register in winnings
 		} else {
 			printSimpleText(gameText, 2, 5)
 			printHangman(mistakes)

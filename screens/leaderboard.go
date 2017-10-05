@@ -8,6 +8,14 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
+type LeaderboardStates int
+
+const (
+	ShowLeaderboard LeaderboardStates = iota
+	ShowLeaderboardFinished
+	ShowLeaderboardUnfinished
+)
+
 const (
 	leaderboardTitle        = "LEADERBOARD"
 	leaderboardSubtitle     = "Choose game you wish to continue"
@@ -27,7 +35,14 @@ type LeaderboardBoard struct {
 
 func (s *Switch) Leaderboard() {
 	s.CurrentState = GameLeaderboard
-	s.ShowLeaderboard()
+	switch s.LeaderboardState.Board {
+	case ShowLeaderboard:
+		s.ShowLeaderboard()
+	case ShowLeaderboardFinished:
+		s.ShowLeaderboardFinished()
+	case ShowLeaderboardUnfinished:
+		s.ShowLeaderboardUnfinished()
+	}
 }
 
 func (s *Switch) ShowLeaderboard() {

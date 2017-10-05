@@ -17,15 +17,18 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 					return
 				case e.Key == termbox.KeyF2:
 					if h.CurrentState == screens.GameLeaderboard {
-						h.ShowLeaderboard()
+						h.LeaderboardState.Board = screens.ShowLeaderboard
+						h.Leaderboard()
 					}
 				case e.Key == termbox.KeyF3:
 					if h.CurrentState == screens.GameLeaderboard {
-						h.ShowLeaderboardFinished()
+						h.LeaderboardState.Board = screens.ShowLeaderboardFinished
+						h.Leaderboard()
 					}
 				case e.Key == termbox.KeyF4:
 					if h.CurrentState == screens.GameLeaderboard {
-						h.ShowLeaderboardUnfinished()
+						h.LeaderboardState.Board = screens.ShowLeaderboardUnfinished
+						h.Leaderboard()
 					}
 				case e.Key == termbox.KeyBackspace2:
 					h.ShowMenu()

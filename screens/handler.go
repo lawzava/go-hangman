@@ -12,13 +12,17 @@ const (
 )
 
 type Switch struct {
-	CurrentState GameState
-	MenuState    MenuState
-	GameID       int
-	GoalWord     string
-	Guesses      []rune
-	X            int
-	Y            int
-	Screen       [][]int
-	DB           daos.Leaderboard
+	CurrentState     GameState
+	MenuState        MenuState
+	LeaderboardState struct {
+		Board     LeaderboardStates
+		Selection int
+	}
+	GameID   int
+	GoalWord string
+	Guesses  []rune
+	X        int
+	Y        int
+	Screen   [][]int
+	DB       daos.Leaderboard
 }
