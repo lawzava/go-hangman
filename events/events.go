@@ -35,14 +35,21 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 				case e.Key == termbox.KeyArrowDown:
 					if h.CurrentState == screens.GameMenu {
 						h.MenuDown()
+					} else if h.CurrentState == screens.GameLeaderboard {
+						h.LeaderboardDown()
 					}
 				case e.Key == termbox.KeyArrowUp:
 					if h.CurrentState == screens.GameMenu {
 						h.MenuUp()
+					} else if h.CurrentState == screens.GameLeaderboard {
+						h.LeaderboardUp()
 					}
 				case e.Key == termbox.KeyEnter:
 					if h.CurrentState == screens.GameMenu {
 						h.MenuEnter(h.MenuState)
+					} else if h.CurrentState == screens.GameLeaderboard {
+						//	h.Leaderboard()
+						// CONTINUE GAME WITH ID
 					}
 				case e.Ch > 0:
 					if h.CurrentState == screens.GameStarted {

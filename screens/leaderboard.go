@@ -34,49 +34,43 @@ type LeaderboardBoard struct {
 }
 
 func (s *Switch) Leaderboard() {
+	var boardRaw []daos.LeaderboardBoardData
 	s.CurrentState = GameLeaderboard
+
 	switch s.LeaderboardState.Board {
 	case ShowLeaderboard:
-		s.ShowLeaderboard()
+		boardRaw = s.DB.GetBoard()
 	case ShowLeaderboardFinished:
-		s.ShowLeaderboardFinished()
+		boardRaw = s.DB.GetBoardFinished()
 	case ShowLeaderboardUnfinished:
-		s.ShowLeaderboardUnfinished()
+		boardRaw = s.DB.GetBoardUnfinished()
 	}
-}
-
-func (s *Switch) ShowLeaderboard() {
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
-	boardRaw := s.DB.GetBoard()
 	boardData := convertToPreparedResponse(boardRaw)
-	drawBoard(boardData)
+	drawBoard(boardData, s.LeaderboardState.Selection)
 	termbox.Sync()
 }
 
-func (s *Switch) ShowLeaderboardFinished() {
-	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
-	boardRaw := s.DB.GetBoardFinished()
-	boardData := convertToPreparedResponse(boardRaw)
-	drawBoard(boardData)
-	termbox.Sync()
+func (s *Switch) LeaderboardDown() {
+	s.LeaderboardState.Selection++
+	s.Leaderboard()
 }
 
-func (s *Switch) ShowLeaderboardUnfinished() {
-	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
-	boardRaw := s.DB.GetBoardUnfinished()
-	boardData := convertToPreparedResponse(boardRaw)
-	drawBoard(boardData)
-	termbox.Sync()
+func (s *Switch) LeaderboardUp() {
+	if s.LeaderboardState.Selection > 0 {
+		s.LeaderboardState.Selection--
+	}
+	s.Leaderboard()
 }
 
-func drawBoard(data []LeaderboardBoard) {
+func drawBoard(data []LeaderboardBoard, selected int) {
 	printSimpleText(leaderboardTitle, 2, 5)
 	printSimpleText(leaderboardSubtitle, 3, 5)
 	printSimpleText(leaderboardInstructions, 4, 5)
-	drawTable(6, 5, data)
+	drawTable(6, 5, selected, data)
 }
 
-func drawTable(y, x int, rows []LeaderboardBoard) {
+func drawTable(y, x, selected int, rows []LeaderboardBoard) {
 	newPosition := x
 
 	for i := 0; i < len(leaderboardTableHeader); i++ {
@@ -91,6 +85,9 @@ func drawTable(y, x int, rows []LeaderboardBoard) {
 			for j := range rows {
 				if lastPosition := printTableElement(newPosition, y+j+1, rows[j].Place); lastPosition > maxPosition {
 					maxPosition = lastPosition
+				}
+				if j == selected {
+					printTableElement(x-1, y+j+1, "*")
 				}
 			}
 		case leaderboardTableHeader[1]:
@@ -171,4 +168,8 @@ func convertCurrentWord(word string, guesses string) string {
 	}
 
 	return newWord
+}
+
+func putStartOnSelected() {
+
 }
