@@ -6,5 +6,7 @@
 
 ## Usage:
 To install dependencies, type `make depends` (make sure your GOPATH is set)
+
 To run from source, in terminal type `make`
+
 To run tests, type `make test`
