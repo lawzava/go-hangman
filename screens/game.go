@@ -36,11 +36,12 @@ var gameOverText = "GAME OVER!"
 
 func (s *Switch) NewGame() {
 	s.GoalWord = getWord()
+	s.Guesses = s.Guesses[:0]
+	s.CurrentState = GameStarted
 	s.ShowGame()
 }
 
 func (s *Switch) ShowGame() {
-	s.CurrentState = GameStarted
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
 	s.CurrentState = renderGame(s.GoalWord, s.Guesses)
 	termbox.Sync()

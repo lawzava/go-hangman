@@ -15,10 +15,8 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 				switch {
 				case e.Key == termbox.KeyEsc || e.Key == termbox.KeyCtrlC:
 					return
-				case e.Key == termbox.KeyBackspace:
-					if h.CurrentState != screens.GameMenu {
-						h.ShowMenu()
-					}
+				case e.Key == termbox.KeyBackspace2:
+					h.ShowMenu()
 				case e.Key == termbox.KeyArrowDown:
 					if h.CurrentState == screens.GameMenu {
 						h.MenuDown()
@@ -32,8 +30,10 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 						h.MenuEnter(h.MenuState)
 					}
 				case e.Ch > 0:
-					if unicode.IsLetter(e.Ch) {
-						h.AddGuess(e.Ch)
+					if h.CurrentState == screens.GameStarted {
+						if unicode.IsLetter(e.Ch) {
+							h.AddGuess(e.Ch)
+						}
 					}
 				}
 			}

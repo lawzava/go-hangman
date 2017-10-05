@@ -1,6 +1,8 @@
 package screens
 
-import termbox "github.com/nsf/termbox-go"
+import (
+	termbox "github.com/nsf/termbox-go"
+)
 
 type MenuState int
 
@@ -44,10 +46,11 @@ func (s *Switch) MenuDown() {
 func (s *Switch) MenuEnter(selectedLine MenuState) {
 	switch selectedLine {
 	case MenuNewGame:
-		s.CurrentState = GameStarted
 		s.NewGame()
 	case MenuContinueLastGame:
-		s.CurrentState = GameStarted
+		if len(s.Guesses) > 0 {
+			s.ShowGame()
+		}
 		// Render previous game
 	case MenuLeaderboard:
 		s.CurrentState = GameLeaderboard
