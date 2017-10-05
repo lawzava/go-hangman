@@ -20,10 +20,12 @@ type LeaderboardBoardData struct {
 }
 
 const (
-	createTable    string = "CREATE TABLE IF NOT EXISTS leaderboard (id INTEGER PRIMARY KEY, word TEXT, guesses []INTEGER, points INTEGER, finished BOOLEAN)"
-	insertGame     string = "INSERT INTO leaderboard (word, guesses, points, finished) VALUES (?, ?, ?, ?)"
-	updateGame     string = "UPDATE leaderboard SET guesses=?, points=?, finished=? WHERE id=?"
-	getLeaderboard string = "SELECT * FROM leaderboard"
+	createTable              string = "CREATE TABLE IF NOT EXISTS leaderboard (id INTEGER PRIMARY KEY, word TEXT, guesses []INTEGER, points INTEGER, finished BOOLEAN)"
+	insertGame               string = "INSERT INTO leaderboard (word, guesses, points, finished) VALUES (?, ?, ?, ?)"
+	updateGame               string = "UPDATE leaderboard SET guesses=?, points=?, finished=? WHERE id=?"
+	getLeaderboard           string = "SELECT * FROM leaderboard ORDER BY points DESC"
+	getLeaderboardFinished   string = "SELECT * FROM leaderboard WHERE finished = 1 ORDER BY points DESC"
+	getLeaderboardUnfinished string = "SELECT * FROM leaderboard WHERE finished = 0 ORDER BY id DESC"
 )
 
 func (l *Leaderboard) InitBoard() {
@@ -36,6 +38,28 @@ func (l *Leaderboard) GetBoard() []LeaderboardBoardData {
 	var oneRow LeaderboardBoardData
 	var fullBoard []LeaderboardBoardData
 	rows, _ := l.Database.Query(getLeaderboard)
+	for rows.Next() {
+		rows.Scan(&oneRow.ID, &oneRow.Word, &oneRow.Guesses, &oneRow.Points, &oneRow.Finished)
+		fullBoard = append(fullBoard, oneRow)
+	}
+	return fullBoard
+}
+
+func (l *Leaderboard) GetBoardFinished() []LeaderboardBoardData {
+	var oneRow LeaderboardBoardData
+	var fullBoard []LeaderboardBoardData
+	rows, _ := l.Database.Query(getLeaderboardFinished)
+	for rows.Next() {
+		rows.Scan(&oneRow.ID, &oneRow.Word, &oneRow.Guesses, &oneRow.Points, &oneRow.Finished)
+		fullBoard = append(fullBoard, oneRow)
+	}
+	return fullBoard
+}
+
+func (l *Leaderboard) GetBoardUnfinished() []LeaderboardBoardData {
+	var oneRow LeaderboardBoardData
+	var fullBoard []LeaderboardBoardData
+	rows, _ := l.Database.Query(getLeaderboardUnfinished)
 	for rows.Next() {
 		rows.Scan(&oneRow.ID, &oneRow.Word, &oneRow.Guesses, &oneRow.Points, &oneRow.Finished)
 		fullBoard = append(fullBoard, oneRow)
