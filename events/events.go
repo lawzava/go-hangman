@@ -1,6 +1,7 @@
 package events
 
 import (
+	"fmt"
 	"unicode"
 
 	"github.com/hitchnsmile/go-hangman/screens"
@@ -60,6 +61,11 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 				}
 			}
 		default:
+			fmt.Println(defaultLog())
 		}
 	}
+}
+
+func defaultLog() string {
+	return "Something went wrong"
 }

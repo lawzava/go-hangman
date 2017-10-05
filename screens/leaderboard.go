@@ -179,7 +179,3 @@ func convertCurrentWord(word string, guesses string) string {
 
 	return newWord
 }
-
-func putStartOnSelected() {
-
-}
