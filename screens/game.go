@@ -1,6 +1,7 @@
 package screens
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -32,7 +33,7 @@ var hangmanPaint = [7][9]string{
 var gameText = "Try to guess this word. Good luck!"
 var gameGuesses = "Already guessed: "
 var gameWonText = "YOU WON! CONGRATULATIONS!"
-var gameOverText = "GAME OVER!"
+var gameOverText = "GAME OVER, YOU LOST!"
 
 func (s *Switch) NewGame() {
 	s.GoalWord = getWord()
@@ -43,7 +44,13 @@ func (s *Switch) NewGame() {
 }
 
 func (s *Switch) ShowGame() {
+	if s.GameID == 0 {
+		s.NewGame()
+		return
+	}
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
+	s.GoalWord, s.Guesses = s.DB.ResumeGame(s.GameID)
+	fmt.Println(s.GoalWord, s.Guesses, s.GameID)
 	s.CurrentState = renderGame(s.GoalWord, s.Guesses)
 	termbox.Sync()
 }

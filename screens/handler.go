@@ -15,8 +15,9 @@ type Switch struct {
 	CurrentState     GameState
 	MenuState        MenuState
 	LeaderboardState struct {
-		Board     LeaderboardStates
-		Selection int
+		Board      LeaderboardStates
+		Selection  int
+		SelectedID int
 	}
 	GameID   int
 	GoalWord string

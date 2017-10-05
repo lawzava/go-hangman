@@ -48,8 +48,8 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 					if h.CurrentState == screens.GameMenu {
 						h.MenuEnter(h.MenuState)
 					} else if h.CurrentState == screens.GameLeaderboard {
-						//	h.Leaderboard()
-						// CONTINUE GAME WITH ID
+						h.GameID = h.LeaderboardState.SelectedID
+						h.MenuEnter(screens.MenuContinueLastGame)
 					}
 				case e.Ch > 0:
 					if h.CurrentState == screens.GameStarted {

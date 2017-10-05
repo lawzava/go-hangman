@@ -23,7 +23,7 @@ func main() {
 	}()
 
 	h.X, h.Y = termbox.Size()
-	h.DB.InitBoard()
+	h.GameID = h.DB.InitBoard()
 	h.ShowMenu()
 	events.EventHandler(event, &h)
 }

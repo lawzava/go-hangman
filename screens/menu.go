@@ -18,7 +18,8 @@ var menuTexts = [3]string{
 	"3) Leaderboard",
 }
 
-var introText = "Welcome to Hangman game! To continue, please select action (navigate with arrow keys and use Enter to select):"
+var introText = "Welcome to Hangman game! To continue, please select action:"
+var introSubtext = "Navigate with arrow keys and press Enter to select. Use backspace to go back after selection."
 
 func (s *Switch) ShowMenu() {
 	s.CurrentState = GameMenu
@@ -48,21 +49,16 @@ func (s *Switch) MenuEnter(selectedLine MenuState) {
 	case MenuNewGame:
 		s.NewGame()
 	case MenuContinueLastGame:
-		if len(s.Guesses) > 0 {
-			s.ShowGame()
-		}
-		// Render previous game
+		s.ShowGame()
 	case MenuLeaderboard:
 		s.CurrentState = GameLeaderboard
 		s.Leaderboard()
-		// Render Leaderboard
 	}
 }
 
 func renderMenu(selectedLine MenuState) {
-	for j, c := range introText {
-		termbox.SetCell(j+5, 2, c, termbox.ColorWhite, termbox.ColorBlack)
-	}
+	printSimpleText(introText, 2, 5)
+	printSimpleText(introSubtext, 3, 5)
 
 	for i := 0; i < len(menuTexts); i++ {
 		fg := termbox.ColorWhite

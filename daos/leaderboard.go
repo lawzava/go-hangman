@@ -16,22 +16,65 @@ type LeaderboardBoardData struct {
 	Word     string
 	Guesses  string
 	Points   int
-	Finished bool
+	Finished int
 }
 
 const (
-	createTable              string = "CREATE TABLE IF NOT EXISTS leaderboard (id INTEGER PRIMARY KEY, word TEXT, guesses []INTEGER, points INTEGER, finished BOOLEAN)"
+	GameWon = iota
+	GameLost
+	GameInProgress
+)
+
+const (
+	createTable              string = "CREATE TABLE IF NOT EXISTS leaderboard (id INTEGER PRIMARY KEY, word TEXT, guesses []INTEGER, points INTEGER, finished INTEGER)"
 	insertGame               string = "INSERT INTO leaderboard (word, guesses, points, finished) VALUES (?, ?, ?, ?)"
 	updateGame               string = "UPDATE leaderboard SET guesses=?, points=?, finished=? WHERE id=?"
 	getLeaderboard           string = "SELECT * FROM leaderboard ORDER BY points DESC"
 	getLeaderboardFinished   string = "SELECT * FROM leaderboard WHERE finished = 1 ORDER BY points DESC"
 	getLeaderboardUnfinished string = "SELECT * FROM leaderboard WHERE finished = 0 ORDER BY id DESC"
+	resumeGame               string = "SELECT word, guesses FROM leaderboard WHERE id=?"
+	getLastGameID            string = "SELECT id FROM leaderboard WHERE finished = ? ORDER BY id DESC LIMIT 1"
 )
 
-func (l *Leaderboard) InitBoard() {
+func (l *Leaderboard) InitBoard() int {
 	l.Database, _ = sql.Open("sqlite3", "./leaderboard.db")
 	statement, _ := l.Database.Prepare(createTable)
 	statement.Exec()
+	return l.GetLastGameID()
+}
+
+func (l *Leaderboard) GetLastGameID() int {
+	var id int
+	row, err := l.Database.Prepare(getLastGameID)
+	if err != nil {
+		panic(err)
+	}
+	err = row.QueryRow(GameInProgress).Scan(&id)
+	if err != nil {
+		return 0
+	}
+	return id
+}
+
+func (l *Leaderboard) ResumeGame(id int) (string, []rune) {
+	var oneRow LeaderboardBoardData
+	var runes []rune
+	row, err := l.Database.Prepare(resumeGame)
+	if err != nil {
+		panic(err)
+	}
+	defer row.Close()
+
+	err = row.QueryRow(id).Scan(&oneRow.Word, &oneRow.Guesses)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, c := range oneRow.Guesses {
+		runes = append(runes, c)
+	}
+
+	return oneRow.Word, runes
 }
 
 func (l *Leaderboard) GetBoard() []LeaderboardBoardData {
@@ -111,7 +154,7 @@ func calculatePoints(word string, guesses []rune) int {
 	return points
 }
 
-func isFinished(word string, guesses []rune) bool {
+func isFinished(word string, guesses []rune) int {
 	wordGuessed := true
 	for _, c := range word {
 		printing := '_'
@@ -126,5 +169,22 @@ func isFinished(word string, guesses []rune) bool {
 		}
 
 	}
-	return wordGuessed
+	if wordGuessed {
+		return GameWon
+	}
+
+	var correctGuesses int
+	for i := range guesses {
+		for _, c := range word {
+			if guesses[i] == c {
+				correctGuesses++
+				break
+			}
+		}
+	}
+	if mistakes := len(guesses) - correctGuesses; mistakes >= 6 {
+		return GameLost
+	}
+
+	return GameInProgress
 }

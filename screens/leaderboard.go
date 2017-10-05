@@ -19,7 +19,7 @@ const (
 const (
 	leaderboardTitle        = "LEADERBOARD"
 	leaderboardSubtitle     = "Choose game you wish to continue"
-	leaderboardInstructions = "F2: Show all games | F3: Show completed games | F4: Show games in progress"
+	leaderboardInstructions = "F2: Show all games | F3: Show completed games | F4: Show games in progress | Navigate with arrow Keys"
 )
 
 var leaderboardTableHeader = []string{"PLACE", "POINTS", "WORD", "GUESSSES", "STATUS"}
@@ -45,6 +45,13 @@ func (s *Switch) Leaderboard() {
 	case ShowLeaderboardUnfinished:
 		boardRaw = s.DB.GetBoardUnfinished()
 	}
+
+	if s.LeaderboardState.Selection > len(boardRaw)-1 {
+		s.LeaderboardState.Selection = len(boardRaw) - 1
+	}
+
+	s.LeaderboardState.SelectedID = boardRaw[s.LeaderboardState.Selection].ID
+
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
 	boardData := convertToPreparedResponse(boardRaw)
 	drawBoard(boardData, s.LeaderboardState.Selection)
@@ -72,7 +79,6 @@ func drawBoard(data []LeaderboardBoard, selected int) {
 
 func drawTable(y, x, selected int, rows []LeaderboardBoard) {
 	newPosition := x
-
 	for i := 0; i < len(leaderboardTableHeader); i++ {
 		maxPosition := newPosition
 
@@ -143,12 +149,16 @@ func convertToPreparedResponse(raw []daos.LeaderboardBoardData) []LeaderboardBoa
 	return response
 }
 
-func finishedStatus(finished bool) string {
-	if finished {
+func finishedStatus(finished int) string {
+	switch finished {
+	case daos.GameWon:
 		return "COMPLETED"
-	} else {
+	case daos.GameLost:
+		return "FAILED"
+	case daos.GameInProgress:
 		return "IN PROGRESS"
 	}
+	return ""
 }
 
 func convertCurrentWord(word string, guesses string) string {
