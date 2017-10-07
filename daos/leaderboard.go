@@ -7,6 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Passes Database struct pointer. In multi-user case should pass only transactions.
 type Leaderboard struct {
 	Database *sql.DB
 }
@@ -25,13 +26,14 @@ const (
 	GameInProgress
 )
 
+// SQL statements.
 const (
 	createTable              string = "CREATE TABLE IF NOT EXISTS leaderboard (id INTEGER PRIMARY KEY, word TEXT, guesses []INTEGER, points INTEGER, finished INTEGER)"
 	insertGame               string = "INSERT INTO leaderboard (word, guesses, points, finished) VALUES (?, ?, ?, ?)"
 	updateGame               string = "UPDATE leaderboard SET guesses=?, points=?, finished=? WHERE id=?"
 	getLeaderboard           string = "SELECT * FROM leaderboard ORDER BY points DESC"
-	getLeaderboardFinished   string = "SELECT * FROM leaderboard WHERE finished = 1 ORDER BY points DESC"
-	getLeaderboardUnfinished string = "SELECT * FROM leaderboard WHERE finished = 0 ORDER BY id DESC"
+	getLeaderboardFinished   string = "SELECT * FROM leaderboard WHERE finished < 2 ORDER BY points DESC"
+	getLeaderboardUnfinished string = "SELECT * FROM leaderboard WHERE finished = 2 ORDER BY id DESC"
 	resumeGame               string = "SELECT word, guesses FROM leaderboard WHERE id=?"
 	getLastGameID            string = "SELECT id FROM leaderboard WHERE finished = ? ORDER BY id DESC LIMIT 1"
 )
@@ -114,8 +116,8 @@ func (l *Leaderboard) InsertGame(word string, guesses []rune) int {
 	var newRow LeaderboardBoardData
 	newRow.Word = word
 	newRow.Guesses = string(guesses)
-	newRow.Points = calculatePoints(word, guesses)
 	newRow.Finished = isFinished(word, guesses)
+	newRow.Points = calculatePoints(word, guesses, newRow.Finished)
 	statement, _ := l.Database.Prepare(insertGame)
 	result, err := statement.Exec(newRow.Word, newRow.Guesses, newRow.Points, newRow.Finished)
 	if err != nil {
@@ -128,8 +130,8 @@ func (l *Leaderboard) InsertGame(word string, guesses []rune) int {
 func (l *Leaderboard) UpdateGame(word string, guesses []rune, id int) {
 	var newRow LeaderboardBoardData
 	newRow.Guesses = string(guesses)
-	newRow.Points = calculatePoints(word, guesses)
 	newRow.Finished = isFinished(word, guesses)
+	newRow.Points = calculatePoints(word, guesses, newRow.Finished)
 	statement, _ := l.Database.Prepare(updateGame)
 	_, err := statement.Exec(newRow.Guesses, newRow.Points, newRow.Finished, id)
 	if err != nil {
@@ -137,21 +139,26 @@ func (l *Leaderboard) UpdateGame(word string, guesses []rune, id int) {
 	}
 }
 
-func calculatePoints(word string, guesses []rune) int {
-	points := len(word) * 10
+func calculatePoints(word string, guesses []rune, finished int) int {
+	switch finished {
+	case GameWon:
+		points := len(word) * 10
 
-	for i := range guesses {
-		penalty := 10
-		for _, c := range word {
-			if guesses[i] == c {
-				penalty = 0
-				break
+		for i := range guesses {
+			penalty := 5
+			for _, c := range word {
+				if guesses[i] == c {
+					penalty = 0
+					break
+				}
 			}
+			points = points - penalty
 		}
-		points = points - penalty
-	}
 
-	return points
+		return points
+	default:
+		return 0
+	}
 }
 
 func isFinished(word string, guesses []rune) int {

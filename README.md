@@ -1,6 +1,6 @@
 # Hangman game in Go
 
-## Requirements:
+## Requirements for development:
 - Glide (https://glide.sh/)
 - Make (https://www.gnu.org/software/make/)
 

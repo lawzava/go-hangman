@@ -1,5 +1,5 @@
 hash: 9b17fc06409989b8a79cb2919ed43f867f7904306e329a1b9687b3dbf02a8974
-updated: 2017-10-05T18:12:03.493487877Z
+updated: 2017-10-05T21:09:36.24276294Z
 imports:
 - name: github.com/mattn/go-runewidth
   version: 9e777a8366cce605130a531d2cd6363d07ad7317
@@ -11,4 +11,8 @@ imports:
   version: 57efc9c3d9f91fb3277f8da1cff370539c4d3dc5
   subpackages:
   - context
-testImports: []
+testImports:
+- name: github.com/magiconair/properties
+  version: 8d7837e64d3c1ee4e54a880c5a920ab4316fc90a
+  subpackages:
+  - assert

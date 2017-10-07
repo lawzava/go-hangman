@@ -30,6 +30,7 @@ func (s *Switch) ShowMenu() {
 	termbox.Sync()
 }
 
+// MenuUp, MenuDown and MenuEnter handles navigation in menu
 func (s *Switch) MenuUp() {
 	if s.MenuState > 0 {
 		s.MenuState = s.MenuState - 1

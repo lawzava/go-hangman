@@ -11,6 +11,7 @@ const (
 	GameLeaderboard
 )
 
+// Main struct of whole game. It acts as a session of a player. After small adjustments, can be easily used for multi-user/multiplayer cases
 type Switch struct {
 	CurrentState     GameState
 	MenuState        MenuState
@@ -22,8 +23,6 @@ type Switch struct {
 	GameID   int
 	GoalWord string
 	Guesses  []rune
-	X        int
-	Y        int
 	Screen   [][]int
 	DB       daos.Leaderboard
 }

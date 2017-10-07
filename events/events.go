@@ -7,6 +7,7 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
+// Listens to all keystrokes and acts accordingly
 func EventHandler(event chan termbox.Event, h *screens.Switch) {
 	for {
 		select {
@@ -30,7 +31,7 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 						h.LeaderboardState.Board = screens.ShowLeaderboardUnfinished
 						h.Leaderboard()
 					}
-				case e.Key == termbox.KeyBackspace2:
+				case e.Key == termbox.KeyBackspace2 || e.Key == termbox.KeyBackspace:
 					h.ShowMenu()
 				case e.Key == termbox.KeyArrowDown:
 					if h.CurrentState == screens.GameMenu {
@@ -64,6 +65,7 @@ func EventHandler(event chan termbox.Event, h *screens.Switch) {
 	}
 }
 
+// not really doing anything. Added just to have something easy to test in this package
 func defaultLog() string {
 	return "Something went wrong"
 }

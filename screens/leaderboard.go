@@ -46,11 +46,13 @@ func (s *Switch) Leaderboard() {
 		boardRaw = s.DB.GetBoardUnfinished()
 	}
 
-	if s.LeaderboardState.Selection > len(boardRaw)-1 {
+	if len(boardRaw) == 0 {
+		s.LeaderboardState.Selection = 0
+	} else if s.LeaderboardState.Selection > len(boardRaw)-1 {
 		s.LeaderboardState.Selection = len(boardRaw) - 1
+	} else {
+		s.LeaderboardState.SelectedID = boardRaw[s.LeaderboardState.Selection].ID
 	}
-
-	s.LeaderboardState.SelectedID = boardRaw[s.LeaderboardState.Selection].ID
 
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
 	boardData := convertToPreparedResponse(boardRaw)
@@ -58,6 +60,7 @@ func (s *Switch) Leaderboard() {
 	termbox.Sync()
 }
 
+// Handles leaderboard navigation
 func (s *Switch) LeaderboardDown() {
 	s.LeaderboardState.Selection++
 	s.Leaderboard()
@@ -86,6 +89,7 @@ func drawTable(y, x, selected int, rows []LeaderboardBoard) {
 			maxPosition = lastPosition
 		}
 
+		// Ugly switch. But more secure than an additional loop. Problem in LeaderboardBoard struct. Should be fixed.
 		switch leaderboardTableHeader[i] {
 		case leaderboardTableHeader[0]:
 			for j := range rows {
